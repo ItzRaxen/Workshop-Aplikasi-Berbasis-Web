@@ -31,30 +31,30 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input sebelum simpan
-        $request->validate([
-            'nama_lengkap'  => 'required|string|max:255',
-            'email'         => 'required|email|max:255',
-            'nomor_telepon' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'alamat'        => 'required|string|max:255',
-            'tanggal_masuk' => 'required|date',
-            'status'        => 'required|string|max:50',
-        ]);
+    $validatedData = $request->validate([
+        'nama_lengkap'  => 'required|string|max:255',
+        'email'         => 'required|email|max:255|unique:employees,email',
+        'nomor_telepon' => 'required|string|max:20',
+        'tanggal_lahir' => 'required|date',
+        'alamat'        => 'required|string|max:255',
+        'tanggal_masuk' => 'required|date',
+        'status'        => 'required|string|max:50',
+        'jabatan_id'    => 'required|integer',
+    ]);
 
-        // Simpan data ke tabel employees
-        Employee::create($request->all());
+    Employee::create($validatedData);
 
-        // Redirect kembali ke daftar pegawai
-        return redirect()->route('employees.index');
+    return redirect()
+        ->route('employees.index')
+        ->with('success', 'Pegawai berhasil ditambahkan!');
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        // Cari data berdasarkan id
         $employee = Employee::findOrFail($id);
         return view('employees.show', compact('employee'));
     }
@@ -64,7 +64,6 @@ class EmployeeController extends Controller
      */
     public function edit(string $id)
     {
-        // Cari data yang akan diedit
         $employee = Employee::findOrFail($id);
         return view('employees.edit', compact('employee'));
     }
@@ -74,30 +73,24 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Validasi input
-        $request->validate([
+        $employee = Employee::findOrFail($id);
+
+        $validatedData = $request->validate([
             'nama_lengkap'  => 'required|string|max:255',
-            'email'         => 'required|email|max:255',
+            'email'         => 'required|email|max:255|unique:employees,email,' . $employee->id,
             'nomor_telepon' => 'required|string|max:20',
             'tanggal_lahir' => 'required|date',
             'alamat'        => 'required|string|max:255',
             'tanggal_masuk' => 'required|date',
             'status'        => 'required|string|max:50',
+            'jabatan_id'    => 'required|integer',
         ]);
 
-        // Update data
-        $employee = Employee::findOrFail($id);
-        $employee->update($request->only([
-            'nama_lengkap',
-            'email',
-            'nomor_telepon',
-            'tanggal_lahir',
-            'alamat',
-            'tanggal_masuk',
-            'status',
-        ]));
+        $employee->update($validatedData);
 
-        return redirect()->route('employees.index');
+        return redirect()
+            ->route('employees.index')
+            ->with('success', 'Data pegawai berhasil diperbarui!');
     }
 
     /**
@@ -105,10 +98,11 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
-        // Hapus data
         $employee = Employee::findOrFail($id);
         $employee->delete();
 
-        return redirect()->route('employees.index');
+        return redirect()
+            ->route('employees.index')
+            ->with('success', 'Data pegawai berhasil dihapus!');
     }
 }
