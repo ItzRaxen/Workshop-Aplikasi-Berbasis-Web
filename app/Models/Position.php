@@ -9,7 +9,10 @@ class Position extends Model
 {
     use HasFactory;
 
-    protected $table = 'positions'; // pastikan ini sesuai dengan nama tabel di database kamu
+   protected $fillable = ['nama_jabatan'];
 
-    protected $fillable = ['nama_jabatan'];
+    public function employees()
+{
+    return $this->hasMany(Employee::class, 'position_id');
+}
 }

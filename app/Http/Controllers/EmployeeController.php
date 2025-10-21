@@ -4,73 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Models\Department; 
+use App\Models\Position; 
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // Ambil data employee terbaru, 5 per halaman
-        $employees = Employee::latest()->paginate(5);
-        return view('employees.index', compact('employees'));
+        $employees = Employee::with(['department', 'position'])->latest()->paginate(5);
+        return view('page.employees.index', compact('employees')); 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        // Tampilkan form input data pegawai
-        return view('employees.create');
+        $departments = Department::all(); 
+        $positions = Position::all(); 
+        return view('page.employees.create', compact('departments', 'positions')); 
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-    $validatedData = $request->validate([
-        'nama_lengkap'  => 'required|string|max:255',
-        'email'         => 'required|email|max:255|unique:employees,email',
-        'nomor_telepon' => 'required|string|max:20',
-        'tanggal_lahir' => 'required|date',
-        'alamat'        => 'required|string|max:255',
-        'tanggal_masuk' => 'required|date',
-        'status'        => 'required|string|max:50',
-        'jabatan_id'    => 'required|integer',
-    ]);
+        $validatedData = $request->validate([
+            'nama_lengkap'  => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:employees,email',
+            'nomor_telepon' => 'required|string|max:20',
+            'tanggal_lahir' => 'required|date',
+            'alamat'        => 'required|string|max:255',
+            'tanggal_masuk' => 'required|date',
+            'status'        => 'required|string|max:50',
+            'department_id' => 'required|integer|exists:departments,id', 
+            'position_id'   => 'required|integer|exists:positions,id', 
+        ]);
+        
+        Employee::create($validatedData);
 
-    Employee::create($validatedData);
-
-    return redirect()
-        ->route('employees.index')
-        ->with('success', 'Pegawai berhasil ditambahkan!');
+        return redirect()
+            ->route('employees.index')
+            ->with('success', 'Pegawai berhasil ditambahkan!');
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $employee = Employee::findOrFail($id);
-        return view('employees.show', compact('employee'));
+        $employee = Employee::with(['department', 'position'])->findOrFail($id); 
+        return view('page.employees.show', compact('employee'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $employee = Employee::findOrFail($id);
-        return view('employees.edit', compact('employee'));
+        $departments = Department::all(); 
+        $positions = Position::all(); 
+        
+        return view('page.employees.edit', compact('employee', 'departments', 'positions'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $employee = Employee::findOrFail($id);
@@ -83,7 +70,8 @@ class EmployeeController extends Controller
             'alamat'        => 'required|string|max:255',
             'tanggal_masuk' => 'required|date',
             'status'        => 'required|string|max:50',
-            'jabatan_id'    => 'required|integer',
+            'department_id' => 'required|integer|exists:departments,id', 
+            'position_id'   => 'required|integer|exists:positions,id',
         ]);
 
         $employee->update($validatedData);
@@ -93,9 +81,6 @@ class EmployeeController extends Controller
             ->with('success', 'Data pegawai berhasil diperbarui!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $employee = Employee::findOrFail($id);

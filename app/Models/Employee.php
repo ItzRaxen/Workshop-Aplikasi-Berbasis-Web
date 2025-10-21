@@ -7,20 +7,37 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
-    use HasFactory;
-    
-    protected $table = 'employees';
+    use HasFactory; 
 
-    // PASTIKAN SEMUA FIELD ADA DI SINI, TERMASUK departemen_id
     protected $fillable = [
-    'nama_lengkap',
-    'email',
-    'nomor_telepon',
-    'tanggal_lahir',
-    'alamat',
-    'tanggal_masuk',
-    'status',
-    'jabatan_id',
+        'nama_lengkap',
+        'email',
+        'nomor_telepon',
+        'tanggal_lahir',
+        'alamat',
+        'tanggal_masuk',
+        'status',
+        'department_id', 
+        'position_id',   
     ];
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+    
+    public function position()
+{
+    return $this->belongsTo(Position::class, 'position_id');
+}
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class,'attendance_id');
+    }
+
+    public function salaries()
+    {
+        return $this->hasMany(Salary::class,'salaries_id');
+    }
 }

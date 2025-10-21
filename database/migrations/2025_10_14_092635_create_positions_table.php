@@ -12,7 +12,9 @@ return new class extends Migration
   public function up(): void { Schema::create('positions', 
     function (Blueprint $table)
      { $table->id(); 
-        $table->string('nama_jabatan', 100); $table->decimal('gaji_pokok', 10, 2); $table->timestamps(); }); }
+        $table->string('nama_jabatan', 100); 
+        $table->decimal('gaji_pokok', 10, 2); 
+        $table->timestamps(); }); }
 
     /**
      * Reverse the migrations.

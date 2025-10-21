@@ -1,33 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EmployeeController; // Pastikan ini ada
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PositionController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\SalaryController;
 
-// 1. Resource Route (untuk Employee CRUD)
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('/test', function () {
+    return view('test');
+});
+
 Route::resource('employees', EmployeeController::class);
-
-
-// 2. Route untuk menu yang menunjuk ke file view BARU
-// Route untuk Department
-Route::get('/department', function () { 
-    // Menunjuk ke resources/views/employees/department_index.blade.php
-    return view('employees.department_index'); 
-});
-
-// Route untuk Attendance
-Route::get('/attendance', function () {
-    // Menunjuk ke resources/views/employees/attendance_index.blade.php
-    return view('employees.attendance_index');
-});
-
-// Route untuk Report
-Route::get('/report', function () {
-    // Menunjuk ke resources/views/employees/report_index.blade.php
-    return view('employees.report_index');
-});
-
-// Route untuk Settings
-Route::get('/settings', function () {
-    // Menunjuk ke resources/views/employees/settings_index.blade.php
-    return view('employees.settings_index');
-});
+Route::resource('departments', DepartmentController::class);
+Route::resource('positions', PositionController::class);
+Route::resource('attendances', AttendanceController::class);
+Route::resource('salaries', SalaryController::class);
